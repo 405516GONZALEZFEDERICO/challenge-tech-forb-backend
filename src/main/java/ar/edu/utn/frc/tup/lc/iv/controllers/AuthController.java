@@ -1,6 +1,5 @@
 package ar.edu.utn.frc.tup.lc.iv.controllers;
 
-
 import ar.edu.utn.frc.tup.lc.iv.dtos.common.LoginUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.common.RegisterUserDto;
 import ar.edu.utn.frc.tup.lc.iv.dtos.common.TokenResponseDto;
@@ -20,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Authentication", description = "Endpoints for user authentication")
@@ -37,8 +35,14 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<TokenResponseDto> register(@RequestBody @Valid RegisterUserDto request) {
-        final TokenResponseDto token = authService.register(request);
-        return ResponseEntity.ok(token);
+        try {
+            final TokenResponseDto token = authService.register(request);
+            return ResponseEntity.ok(token);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/login")
@@ -50,8 +54,16 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<TokenResponseDto> login(@RequestBody @Valid LoginUserDto request) {
-        final TokenResponseDto token = authService.login(request);
-        return ResponseEntity.ok(token);
+        try {
+            final TokenResponseDto token = authService.login(request);
+            return ResponseEntity.ok(token);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getBody().getStatus()).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping("/refresh")
@@ -78,12 +90,17 @@ public class AuthController {
             @RequestHeader(HttpHeaders.AUTHORIZATION)
             @Parameter(hidden = true) final String authHeader
     ) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Authorization header must start with 'Bearer '");
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Authorization header must start with 'Bearer '");
+            }
+            TokenResponseDto response = authService.refreshToken(authHeader);
+            return ResponseEntity.ok(response);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getBody().getStatus()).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-
-        TokenResponseDto response = authService.refreshToken(authHeader);
-        return ResponseEntity.ok(response);
     }
 }

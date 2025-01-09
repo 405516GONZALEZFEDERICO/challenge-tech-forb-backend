@@ -38,16 +38,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger UI endpoints
                         .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/swagger-resources/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/swagger-ui.html")).permitAll()
-                        // H2 Console (allowed for testing)
                         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
-                        // Authentication endpoints
                         .requestMatchers(new AntPathRequestMatcher("/auth/**")).permitAll()
-                        // Other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))

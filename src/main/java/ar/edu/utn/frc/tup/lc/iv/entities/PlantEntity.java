@@ -1,39 +1,34 @@
 package ar.edu.utn.frc.tup.lc.iv.entities;
 
-import ar.edu.utn.frc.tup.lc.iv.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "tokens")
+@Table(name = "plants")
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TokenEntity {
-
+public class PlantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
-
     @Column
-    public String token;
-
-    @Enumerated(EnumType.STRING)
-    public TokenType type;
-
-
+    public String name;
     @Column
-    public  boolean revoked;
-
+    public String country;
     @Column
-    public  boolean expired;
+    public Integer readings;
+    @Column
+    public Integer medAlerts;
+    @Column
+    public Integer redAlerts;
+    @Column
+    public Integer sensorsDisabled;
+    @Column
+    public boolean status;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public UserEntity user;
 }

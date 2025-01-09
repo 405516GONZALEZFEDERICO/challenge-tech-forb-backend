@@ -1,5 +1,8 @@
 package ar.edu.utn.frc.tup.lc.iv.dtos.common;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,19 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterUserDto {
-    /**
-     * Nombre real del usuario.
-     */
+    @NotBlank
+    @Size(min = 3, max = 50)
     private String name;
 
-    /**
-     * Contraseña del usuario utilizada en login.
-     */
+    @NotBlank
+    @Size(min = 8)
     private String password;
-    /**
-     * Email utilizado en login.
-     */
+
+    @NotBlank
+    @Email
     private String email;
 
+    private String urlImg;
 
 }
